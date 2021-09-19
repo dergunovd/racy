@@ -12,6 +12,8 @@ target 'GeoTracker' do
     :hermes_enabled => false
   )
 
+  pod 'react-native-admob', :path => '../node_modules/react-native-admob'
+
   target 'GeoTrackerTests' do
     inherit! :complete
     # Pods for testing
