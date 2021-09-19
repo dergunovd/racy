@@ -5,27 +5,34 @@ import {isSameCoords, msTokmh} from '../utils/utils';
 import {distanceTo} from 'geolocation-utils';
 
 enum RaceState {
-  NOT_READY,
-  READY,
+  START,
   RACE,
 }
 
 export const useStore = () => {
   const [startPoint, setStartPoint] = useState<LatLng>();
-  const [state, setState] = useState<RaceState>(RaceState.NOT_READY);
+  const [state, setState] = useState<RaceState>(RaceState.START);
   const [maxSpeed, setMaxSpeed] = useState<number>(0);
   const [curSpeed, setCurSpeed] = useState<number>(0);
   const [lapStartTime, setLapStartTime] = useState<number>();
   const [distance, setDistance] = useState<number>(0);
   const [coords, setCoords] = useState<LatLng>();
+  const [prevCoords, setPrevCoords] = useState<LatLng>();
   const [path, setPath] = useState<LatLng[]>([]);
   const [laps, setLaps] = useState<LapTotal[]>([]);
+  const [isStart, setStart] = useState<boolean>(false);
 
   const startLap = useCallback(() => {
     setLapStartTime(Date.now());
+    setPath([]);
+    setDistance(0);
+    setMaxSpeed(0);
   }, []);
 
   const endLap = useCallback(() => {
+    if (!lapStartTime) {
+      return;
+    }
     const time = Date.now() - (lapStartTime ?? Date.now());
     const timeInSeconds = time / 1000;
     setLaps([
@@ -37,6 +44,7 @@ export const useStore = () => {
         time: Date.now() - (lapStartTime ?? Date.now()),
       },
     ]);
+
     setLapStartTime(undefined);
   }, [distance, lapStartTime, laps, maxSpeed]);
 
@@ -48,77 +56,73 @@ export const useStore = () => {
 
   const update = useCallback(
     (coordinates: EventUserLocation['nativeEvent']['coordinate']) => {
-      const prevCoords = path[path.length - 1];
-      const isSamePrevCoords = isSameCoords(prevCoords, coordinates);
-      const isSameStartCoords = isSameCoords(startPoint, coordinates);
-      switch (state) {
-        case RaceState.NOT_READY:
-          if (isSameStartCoords) {
-            setState(RaceState.READY);
-          }
-          setCoords({
-            latitude: coordinates.latitude,
-            longitude: coordinates.longitude,
-          });
-          setCurSpeed(coordinates.speed);
-          break;
-        case RaceState.READY:
-          if (!isSameStartCoords) {
-            setState(RaceState.RACE);
-            startLap();
-          }
-          setCoords({
-            latitude: coordinates.latitude,
-            longitude: coordinates.longitude,
-          });
-          setCurSpeed(coordinates.speed);
-          setPath(
-            path.length > 0 && isSamePrevCoords
-              ? path
-              : [
-                  ...path,
-                  {
-                    latitude: coordinates.latitude,
-                    longitude: coordinates.longitude,
-                  },
-                ],
-          );
-          setDistance(
-            !prevCoords || isSamePrevCoords
-              ? distance
-              : distance + distanceTo(prevCoords, coordinates),
-          );
-          break;
-        case RaceState.RACE:
-          if (isSameStartCoords) {
-            setState(RaceState.READY);
-            endLap();
-          }
-          setCoords({
-            latitude: coordinates.latitude,
-            longitude: coordinates.longitude,
-          });
-          setCurSpeed(coordinates.speed);
-          setMaxSpeed(Math.max(maxSpeed ?? 0, coordinates.speed ?? 0));
-          setPath(
-            path.length > 0 && isSamePrevCoords
-              ? path
-              : [
-                  ...path,
-                  {
-                    latitude: coordinates.latitude,
-                    longitude: coordinates.longitude,
-                  },
-                ],
-          );
-          setDistance(
-            !prevCoords || isSamePrevCoords
-              ? distance
-              : distance + distanceTo(prevCoords, coordinates),
-          );
+      setPrevCoords(coords);
+      setCoords({
+        latitude: coordinates.latitude,
+        longitude: coordinates.longitude,
+      });
+      setCurSpeed(msTokmh(coordinates.speed));
+
+      if (startPoint && prevCoords) {
+        const isSamePrevCoords = isSameCoords(
+          prevCoords,
+          coordinates,
+          coordinates.accuracy,
+        );
+        const distanceToPrevCoords = distanceTo(prevCoords, coordinates);
+        const isSameStartCoords = isSameCoords(
+          startPoint,
+          coordinates,
+          distanceToPrevCoords + coordinates.accuracy,
+        );
+
+        switch (state) {
+          case RaceState.START:
+            setStart(isSameStartCoords);
+            if (isSameStartCoords) {
+              setState(RaceState.RACE);
+            }
+            break;
+          case RaceState.RACE:
+            if (isSameStartCoords) {
+              endLap();
+            } else if (isStart) {
+              startLap();
+            }
+            setStart(isSameStartCoords);
+
+            setMaxSpeed(Math.max(maxSpeed ?? 0, coordinates.speed ?? 0));
+            setPath(
+              path.length > 0 && isSamePrevCoords
+                ? path
+                : [
+                    ...path,
+                    {
+                      latitude: coordinates.latitude,
+                      longitude: coordinates.longitude,
+                    },
+                  ],
+            );
+            setDistance(
+              !prevCoords || isSamePrevCoords
+                ? distance
+                : distance + distanceToPrevCoords,
+            );
+        }
       }
     },
-    [distance, endLap, maxSpeed, path, startLap, startPoint, state],
+    [
+      coords,
+      distance,
+      endLap,
+      isStart,
+      maxSpeed,
+      path,
+      prevCoords,
+      startLap,
+      startPoint,
+      state,
+    ],
   );
 
   return {
