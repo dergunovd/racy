@@ -1,0 +1,51 @@
+{
+  "name": "geotracker",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "android": "react-native run-android",
+    "ios": "react-native run-ios",
+    "start": "react-native start",
+    "test": "jest",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
+  },
+  "dependencies": {
+    "date-fns": "^2.24.0",
+    "geolocation-utils": "^1.2.5",
+    "react": "17.0.2",
+    "react-native": "0.65.1",
+    "react-native-maps": "^0.29.3",
+    "react-native-vector-icons": "^8.1.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.15.5",
+    "@babel/runtime": "^7.15.4",
+    "@react-native-community/eslint-config": "^3.0.1",
+    "@types/jest": "^27.0.1",
+    "@types/react-native": "^0.65.0",
+    "@types/react-native-vector-icons": "^6.4.8",
+    "@types/react-test-renderer": "^17.0.1",
+    "babel-jest": "^27.2.0",
+    "eslint": "^7.32.0",
+    "jest": "^27.2.0",
+    "metro-react-native-babel-preset": "^0.66.2",
+    "prettier": "^2.4.1",
+    "react-native-codegen": "^0.0.7",
+    "react-test-renderer": "17.0.2",
+    "typescript": "^4.4.3"
+  },
+  "resolutions": {
+    "@types/react": "^17"
+  },
+  "jest": {
+    "preset": "react-native",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json",
+      "node"
+    ]
+  }
+}
