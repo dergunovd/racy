@@ -84,13 +84,6 @@ export const useStore = () => {
             }
             break;
           case RaceState.RACE:
-            if (isSameStartCoords) {
-              endLap();
-            } else if (isStart) {
-              startLap();
-            }
-            setStart(isSameStartCoords);
-
             setMaxSpeed(Math.max(maxSpeed ?? 0, coordinates.speed ?? 0));
             setPath(
               path.length > 0 && isSamePrevCoords
@@ -108,6 +101,13 @@ export const useStore = () => {
                 ? distance
                 : distance + distanceToPrevCoords,
             );
+
+            if (isSameStartCoords) {
+              endLap();
+            } else if (isStart) {
+              startLap();
+            }
+            setStart(isSameStartCoords);
         }
       }
     },
