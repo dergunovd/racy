@@ -9,6 +9,7 @@ const Pressable = styled.Pressable`
   border-radius: 4px;
   justify-content: center;
   align-items: center;
+  opacity: ${props => (props.disabled ? '0.5' : '1')};
 `;
 
 export const Button: FC<PressableProps & {children: string}> = ({

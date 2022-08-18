@@ -1,13 +1,19 @@
 import React, {FC, useCallback, useEffect, useRef, useState} from 'react';
 import MapView, {
+  LatLng,
   LongPressEvent,
+  MarkerAnimated,
+  MarkerDragStartEndEvent,
   UserLocationChangeEvent,
 } from 'react-native-maps';
 
+// @ts-expect-error types
+import startMarker from '../images/start-marker.png';
 import {hasLocationPermission} from '../utils';
 
 export const Map: FC = () => {
   const [isInit, setInit] = useState(false);
+  const [startPoint, setStartPoint] = useState<LatLng>();
   const map = useRef<MapView | null>();
 
   const watchSuccess = useCallback(
@@ -30,10 +36,13 @@ export const Map: FC = () => {
     hasLocationPermission();
   }, []);
 
-  const setStartPointHandler = useCallback((event: LongPressEvent) => {
-    console.log(event.nativeEvent);
-    // setStartPoint(event.nativeEvent.coordinate);
-  }, []);
+  const setStartPointHandler = useCallback(
+    (event: LongPressEvent | MarkerDragStartEndEvent) => {
+      console.log(event.nativeEvent);
+      setStartPoint(event.nativeEvent.coordinate);
+    },
+    [],
+  );
 
   return (
     <MapView
@@ -51,7 +60,15 @@ export const Map: FC = () => {
       followsUserLocation
       ref={ref => {
         map.current = ref;
-      }}
-    />
+      }}>
+      {startPoint ? (
+        <MarkerAnimated
+          draggable
+          onDragEnd={setStartPointHandler}
+          coordinate={startPoint}
+          image={startMarker}
+        />
+      ) : null}
+    </MapView>
   );
 };

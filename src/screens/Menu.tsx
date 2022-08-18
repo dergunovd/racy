@@ -1,8 +1,9 @@
 import styled from '@emotion/native';
-import React, {FC, useState} from 'react';
+import React, {FC, useCallback, useContext, useState} from 'react';
 import {Pressable} from 'react-native';
 import {Button, Chip, InputWithUnit} from '../components';
 import {useNavigate} from 'react-router';
+import {StoreContext} from '../store/Store.context';
 
 const Screen = styled.ScrollView`
   background: #fff;
@@ -43,10 +44,27 @@ const InputContainer = styled.View`
 `;
 export const Menu: FC = () => {
   const navigate = useNavigate();
-  const [theme, setTheme] = useState<'system' | 'light' | 'dark'>('light');
-  const [accuracy, setAccuracy] = useState<'low' | 'normal' | 'high'>('normal');
+  const {
+    state: {settings},
+    dispatch,
+  } = useContext(StoreContext);
+  const [theme, setTheme] = useState<'system' | 'light' | 'dark'>(
+    settings.theme,
+  );
+  const [accuracy, setAccuracy] = useState<'low' | 'normal' | 'high'>(
+    settings.accuracy,
+  );
+  const [newLapAccuracy, setNewLapAccuracy] = useState(
+    `${settings.newLapAccuracy}`,
+  );
 
-  const [newLapAccuracy, setNewLapAccuracy] = useState('5');
+  const save = useCallback(() => {
+    dispatch({
+      type: 'set',
+      value: {settings: {theme, accuracy, newLapAccuracy: +newLapAccuracy}},
+    });
+    navigate('/');
+  }, [accuracy, dispatch, navigate, newLapAccuracy, theme]);
 
   return (
     <Screen>
@@ -109,7 +127,9 @@ export const Menu: FC = () => {
       </Section>
 
       <Section withoutBorder>
-        <Button onPress={() => navigate('/')}>Готово</Button>
+        <Button onPress={save} disabled={isNaN(+newLapAccuracy)}>
+          Готово
+        </Button>
       </Section>
     </Screen>
   );
