@@ -2,7 +2,7 @@ import React, {FC, PropsWithChildren, useCallback, useEffect} from 'react';
 import {SafeAreaView, BackHandler} from 'react-native';
 import {NativeRouter, Route, Routes, useNavigate} from 'react-router-native';
 
-import {Start, Menu} from './screens';
+import {Start, Menu, Race, Result, History} from './screens';
 import {StoreProvider} from './store/StoreProvider';
 
 const BackPressHandler: FC<PropsWithChildren> = ({children}) => {
@@ -33,9 +33,9 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Start />} />
             <Route path="/menu" element={<Menu />} />
-            {/*<Route path="/race" element={<Race />} />*/}
-            {/*<Route path="/result" element={<Race />} />*/}
-            {/*<Route path="/history" element={<History />} />*/}
+            <Route path="/race" element={<Race />} />
+            <Route path="/result" element={<Result />} />
+            <Route path="/history" element={<History />} />
           </Routes>
         </BackPressHandler>
       </NativeRouter>

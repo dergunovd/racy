@@ -1,4 +1,4 @@
-import React, {FC, useEffect, useState} from 'react';
+import React, {FC} from 'react';
 import styled from '@emotion/native';
 
 import {MediumText} from './MediumText';
@@ -6,8 +6,8 @@ import {Activable} from '../types';
 
 interface Props {
   items: number[];
+  value: number;
   onPress?: null | ((value: number) => void) | undefined;
-  defaultValue?: number;
 }
 
 const PickerBody = styled.View`
@@ -53,23 +53,17 @@ const Line = styled.View<Activable>`
   margin-top: 6px;
 `;
 
-export const Picker: FC<Props> = ({items, onPress, defaultValue}) => {
-  const [val, setVal] = useState<number>(defaultValue ?? 0);
-
-  useEffect(() => {
-    onPress?.(val);
-  }, [onPress, val]);
-
+export const Picker: FC<Props> = ({items, onPress, value}) => {
   return (
     <PickerBody>
-      {items.map((value, index) => {
-        const isActive = value <= val;
+      {items.map((val, index) => {
+        const isActive = val <= value;
         return (
-          <React.Fragment key={value}>
+          <React.Fragment key={val}>
             {index ? <Line active={isActive} /> : null}
-            <Point onPress={() => setVal(value)}>
+            <Point onPress={() => onPress?.(val)}>
               <Dot active={isActive} />
-              <Text active={isActive}>{value}</Text>
+              <Text active={isActive}>{val}</Text>
             </Point>
           </React.Fragment>
         );

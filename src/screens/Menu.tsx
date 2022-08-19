@@ -48,12 +48,8 @@ export const Menu: FC = () => {
     state: {settings},
     dispatch,
   } = useContext(StoreContext);
-  const [theme, setTheme] = useState<'system' | 'light' | 'dark'>(
-    settings.theme,
-  );
-  const [accuracy, setAccuracy] = useState<'low' | 'normal' | 'high'>(
-    settings.accuracy,
-  );
+  const [theme, setTheme] = useState(settings.theme);
+  const [accuracy, setAccuracy] = useState(settings.accuracy);
   const [newLapAccuracy, setNewLapAccuracy] = useState(
     `${settings.newLapAccuracy}`,
   );
@@ -68,7 +64,7 @@ export const Menu: FC = () => {
 
   return (
     <Screen>
-      <Pressable>
+      <Pressable onPress={() => navigate('/history')}>
         <Section>
           <Title>История записей</Title>
           <SubTitle>15 записей</SubTitle>
@@ -98,8 +94,8 @@ export const Menu: FC = () => {
             Экономная
           </Chip>
           <Chip
-            active={accuracy === 'normal'}
-            onPress={() => setAccuracy('normal')}>
+            active={accuracy === 'balanced'}
+            onPress={() => setAccuracy('balanced')}>
             Средняя
           </Chip>
           <Chip
