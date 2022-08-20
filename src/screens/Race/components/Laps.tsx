@@ -3,6 +3,7 @@ import styled from '@emotion/native';
 
 import {StoreContext} from '../../../store/Store.context';
 import {timeFormatter} from '../../../utils/formatters';
+import {getBestLap} from '../../../utils/race';
 
 const Container = styled.ScrollView`
   height: 80px;
@@ -21,12 +22,7 @@ export const Laps: FC = () => {
     state: {race},
   } = useContext(StoreContext);
 
-  const bestTime = useMemo(
-    () => Math.min(...race.laps.map(({time}) => time)),
-    [race.laps],
-  );
-
-  console.log(race.laps.map(lap => lap.startTime));
+  const bestTime = useMemo(() => getBestLap(race.laps)?.time, [race.laps]);
 
   return (
     <Container>

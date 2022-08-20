@@ -27,7 +27,11 @@ const ComponentsPage = () => (
       text="Старт через 10 м"
     />
     <Br />
-    <Picker onPress={console.log} items={[0, 10, 15, 30, 50, 75, 100]} />
+    <Picker
+      onPress={console.log}
+      value={15}
+      items={[0, 10, 15, 30, 50, 75, 100]}
+    />
     <Br />
     <View style={{flexDirection: 'row'}}>
       <Chip>Экономная</Chip>

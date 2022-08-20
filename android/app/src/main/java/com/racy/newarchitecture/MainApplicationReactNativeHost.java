@@ -1,4 +1,4 @@
-package com.racy.newarchitecture;
+package net.dergunov.racy.newarchitecture;
 
 import android.app.Application;
 import androidx.annotation.NonNull;
@@ -19,9 +19,9 @@ import com.facebook.react.fabric.CoreComponentsRegistry;
 import com.facebook.react.fabric.FabricJSIModuleProvider;
 import com.facebook.react.fabric.ReactNativeConfig;
 import com.facebook.react.uimanager.ViewManagerRegistry;
-import com.racy.BuildConfig;
-import com.racy.newarchitecture.components.MainComponentsRegistry;
-import com.racy.newarchitecture.modules.MainApplicationTurboModuleManagerDelegate;
+import net.dergunov.racy.BuildConfig;
+import net.dergunov.racy.newarchitecture.components.MainComponentsRegistry;
+import net.dergunov.racy.newarchitecture.modules.MainApplicationTurboModuleManagerDelegate;
 import java.util.ArrayList;
 import java.util.List;
 

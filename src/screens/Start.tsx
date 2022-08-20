@@ -123,7 +123,6 @@ export const Start: FC = () => {
           <Picker
             value={race.startAfter ?? 0}
             onPress={startAfter => {
-              console.log('onpress', startAfter);
               dispatch({
                 type: 'set',
                 value: {race: {...race, startAfter}},

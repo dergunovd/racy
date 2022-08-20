@@ -1,4 +1,4 @@
-package com.racy;
+package net.dergunov.racy;
 
 import com.facebook.react.ReactActivity;
 import com.facebook.react.ReactActivityDelegate;

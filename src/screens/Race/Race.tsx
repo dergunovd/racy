@@ -121,11 +121,7 @@ export const Race: FC = () => {
           </InfoRow>
           <InfoRow>
             <Laps />
-            <Stop
-              onPress={() => {
-                dispatch({type: 'reset'});
-                navigate('/result');
-              }}>
+            <Stop onPress={() => navigate('/result')}>
               <StopIcon />
             </Stop>
           </InfoRow>
