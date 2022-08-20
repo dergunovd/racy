@@ -1,6 +1,17 @@
 import {LatLng} from 'react-native-maps';
 import {UserLocationChangeEvent} from 'react-native-maps/lib/MapView.types';
+import {TimeDistance} from 'geolocation-utils';
 
+export interface Lap {
+  lapNumber: number;
+  path: UserLocationChangeEvent['nativeEvent']['coordinate'][];
+  distance: number;
+  maxSpeed: number;
+  minSpeed: number;
+  averageSpeed: number;
+  startTime?: number;
+  time: number;
+}
 export interface Store {
   settings: {
     theme: 'light' | 'dark' | 'system';
@@ -19,8 +30,8 @@ export interface Store {
     averageSpeed: number;
     distance: number;
     coords?: LatLng;
-    isStart: boolean;
-    laps: any[];
+    laps: Lap[];
+    cpa?: TimeDistance;
   };
 }
 

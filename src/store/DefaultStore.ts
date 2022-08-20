@@ -17,7 +17,6 @@ export const DEFAULT_STORE: Store = {
     distance: 0,
     averageSpeed: 0,
     coords: {latitude: 0, longitude: 0},
-    isStart: false,
     laps: [],
   },
 };

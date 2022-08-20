@@ -1,10 +1,12 @@
-import React, {FC} from 'react';
+import React, {FC, useContext, useMemo} from 'react';
 import styled from '@emotion/native';
 
 import {Laps} from '../Race/components/Laps';
 import {BestLap} from './components/BestLap';
 import {Button} from '../../components';
 import {useNavigate} from 'react-router';
+import {StoreContext} from '../../store/Store.context';
+import {getBestLap} from '../../utils/race';
 
 const Content = styled.ScrollView`
   background: #313131;
@@ -33,6 +35,8 @@ const ButtonWrap = styled.View`
 
 export const Result: FC = () => {
   const navigate = useNavigate();
+  const {dispatch} = useContext(StoreContext);
+
   return (
     <Content>
       <Row>
@@ -47,6 +51,8 @@ export const Result: FC = () => {
       <ButtonWrap>
         <Button
           onPress={() => {
+            dispatch({type: 'reset'});
+
             navigate('/');
           }}>
           На главный экран

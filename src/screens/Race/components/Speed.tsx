@@ -1,8 +1,9 @@
-import React, {FC, useContext} from 'react';
+import React, {FC, useContext, useMemo} from 'react';
 import styled from '@emotion/native';
 import {StoreContext} from '../../../store/Store.context';
 import {msTokmh} from '../../../utils/geolocation';
-import {speedFormatter} from '../../../utils/formatters';
+import {numberWithSign, speedFormatter} from '../../../utils/formatters';
+import {getBestLap} from '../../../utils/race';
 
 const Min = styled.Text`
   font-weight: 400;
@@ -33,19 +34,42 @@ export const Speed: FC = () => {
   const {
     state: {race},
   } = useContext(StoreContext);
+
+  const bestLap = useMemo(() => getBestLap(race.laps), [race.laps]);
+
   return (
     <>
       <Section>
         <Min>{speedFormatter(msTokmh(race.minSpeed))}</Min>
-        <Delta>+0.2</Delta>
+        {bestLap && (
+          <Delta>
+            {numberWithSign(
+              +speedFormatter(msTokmh(race.minSpeed - bestLap.minSpeed)),
+            )}
+          </Delta>
+        )}
       </Section>
       <Section>
-        <Average>{speedFormatter(msTokmh(race.curSpeed))} км/ч</Average>
-        <Delta big>-0.8</Delta>
+        <Average>{speedFormatter(msTokmh(race.averageSpeed))} км/ч</Average>
+        {bestLap && (
+          <Delta big>
+            {numberWithSign(
+              +speedFormatter(
+                msTokmh(race.averageSpeed - bestLap.averageSpeed),
+              ),
+            )}
+          </Delta>
+        )}
       </Section>
       <Section>
         <Max>{speedFormatter(msTokmh(race.maxSpeed))}</Max>
-        <Delta>-5.2</Delta>
+        {bestLap && (
+          <Delta>
+            {numberWithSign(
+              +speedFormatter(msTokmh(race.maxSpeed - bestLap.maxSpeed)),
+            )}
+          </Delta>
+        )}
       </Section>
     </>
   );
