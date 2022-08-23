@@ -5,15 +5,18 @@ import React, {
   useMemo,
   useState,
 } from 'react';
+import {useColorScheme} from 'react-native';
+import {ThemeProvider} from '@emotion/react';
+
 import {ThemeContext} from '../contexts';
 import {useStoreKey} from '../hooks';
-import {ThemeProvider} from '@emotion/react';
 import {lightTheme} from './light';
 import {darkTheme} from './dark';
 
 export const AppThemeProvider: FC<PropsWithChildren> = ({children}) => {
   const [theme, setTheme] = useState('dark');
   const themeFromStore = useStoreKey('theme');
+  const systemTheme = useColorScheme();
 
   useEffect(() => {
     setTheme(themeFromStore);
@@ -25,12 +28,12 @@ export const AppThemeProvider: FC<PropsWithChildren> = ({children}) => {
         return lightTheme;
       case 'dark':
         return darkTheme;
-      // TODO: get system theme
       case 'system':
+        return systemTheme === 'dark' ? darkTheme : lightTheme;
       default:
         return darkTheme;
     }
-  }, [theme]);
+  }, [systemTheme, theme]);
 
   return (
     <ThemeContext.Provider value={{theme, setTheme}}>
