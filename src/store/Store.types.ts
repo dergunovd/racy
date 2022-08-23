@@ -13,26 +13,20 @@ export interface Lap {
   time: number;
 }
 export interface Store {
-  settings: {
-    theme: 'light' | 'dark' | 'system';
-    accuracy: 'low' | 'balanced' | 'high';
-    newLapAccuracy: number;
-  };
-  race: {
-    startPoint?: LatLng;
-    startAfter?: number;
-    lap?: number;
-    lapStartTime?: number;
-    curSpeed: number;
-    path: UserLocationChangeEvent['nativeEvent']['coordinate'][];
-    maxSpeed: number;
-    minSpeed: number;
-    averageSpeed: number;
-    distance: number;
-    coords?: LatLng;
-    laps: Lap[];
-    cpa?: TimeDistance;
-  };
+  startPoint?: LatLng;
+  preStartPoint?: LatLng;
+  startAfter?: number;
+  lap?: number;
+  lapStartTime?: number;
+  curSpeed: number;
+  path: UserLocationChangeEvent['nativeEvent']['coordinate'][];
+  maxSpeed: number;
+  minSpeed: number;
+  averageSpeed: number;
+  distance: number;
+  coords?: LatLng;
+  laps: Lap[];
+  cpa?: TimeDistance;
 }
 
 export type Action =
@@ -43,5 +37,7 @@ export type Action =
   | {
       type: 'watch';
       value: UserLocationChangeEvent['nativeEvent']['coordinate'];
+      newLapAccuracy: number;
+      newLap?: boolean;
     }
   | {type: 'reset'};

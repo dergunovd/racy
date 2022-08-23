@@ -1,5 +1,6 @@
 import React, {FC, useContext, useEffect, useRef, useState} from 'react';
 import styled from '@emotion/native';
+
 import {timeFormatter} from '../../../utils/formatters';
 import {StoreContext} from '../../../store/Store.context';
 
@@ -13,9 +14,7 @@ export const Timer: FC = () => {
   const intervalId = useRef(0);
   const [time, setTime] = useState<number>();
   const {
-    state: {
-      race: {lapStartTime},
-    },
+    state: {lapStartTime},
   } = useContext(StoreContext);
 
   useEffect(() => {

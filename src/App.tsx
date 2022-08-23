@@ -1,32 +1,29 @@
-import React, {FC, PropsWithChildren, useCallback, useEffect} from 'react';
-import {SafeAreaView, BackHandler} from 'react-native';
+import React, {FC, PropsWithChildren, useCallback} from 'react';
 import {NativeRouter, Route, Routes, useNavigate} from 'react-router-native';
+import {useBackHandler} from '@react-native-community/hooks';
 
 import {Start, Menu, Race, Result, History} from './screens';
 import {StoreProvider} from './store/StoreProvider';
+import styled from '@emotion/native';
 
 const BackPressHandler: FC<PropsWithChildren> = ({children}) => {
   const navigate = useNavigate();
   const handleBackButtonClick = useCallback(() => {
     navigate(-1);
-    return false;
+    return true;
   }, [navigate]);
 
-  useEffect(() => {
-    BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick);
-
-    return () => {
-      BackHandler.removeEventListener(
-        'hardwareBackPress',
-        handleBackButtonClick,
-      );
-    };
-  }, [handleBackButtonClick]);
+  useBackHandler(handleBackButtonClick);
 
   return <>{children}</>;
 };
+
+const Body = styled.SafeAreaView`
+  height: 100%;
+`;
+
 const App = () => (
-  <SafeAreaView style={{height: '100%'}}>
+  <Body>
     <StoreProvider>
       <NativeRouter>
         <BackPressHandler>
@@ -40,7 +37,7 @@ const App = () => (
         </BackPressHandler>
       </NativeRouter>
     </StoreProvider>
-  </SafeAreaView>
+  </Body>
 );
 
 export default App;

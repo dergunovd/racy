@@ -5,6 +5,7 @@ import MapView, {
   Polyline,
   UserLocationChangeEvent,
 } from 'react-native-maps';
+import {distanceTo} from 'geolocation-utils';
 
 import styled from '@emotion/native';
 
@@ -12,10 +13,9 @@ import styled from '@emotion/native';
 import startMarker from '../../images/start-marker.png';
 import {StoreContext} from '../../store/Store.context';
 import {Map} from '../../components';
-import {Timer} from './components/Timer';
-import {Speed} from './components/Speed';
-import {Laps} from './components/Laps';
 import {StopIcon} from '../../components/icons';
+import {Laps, Speed, Timer} from './components';
+import {useStoreKey} from '../../hooks';
 
 const MapContainer = styled.View`
   position: absolute;
@@ -59,14 +59,15 @@ const Stop = styled.Pressable`
 `;
 
 export const Race: FC = () => {
-  const {
-    state: {settings, race},
-    dispatch,
-  } = useContext(StoreContext);
+  const {state, dispatch} = useContext(StoreContext);
   const navigate = useNavigate();
 
   const [isInit, setInit] = useState(false);
   const map = useRef<MapView | null>();
+  const accuracy = useStoreKey('accuracy');
+  const newLapAccuracy = useStoreKey('newLapAccuracy');
+
+  console.log(state);
 
   const watchSuccess = useCallback(
     (event: UserLocationChangeEvent) => {
@@ -80,15 +81,41 @@ export const Race: FC = () => {
         });
         setInit(true);
       }
-      dispatch({type: 'watch', value: event.nativeEvent.coordinate});
+      const shouldSetStartPoint =
+        !state.startPoint &&
+        state.preStartPoint &&
+        event.nativeEvent.coordinate &&
+        distanceTo(state.preStartPoint, event.nativeEvent.coordinate) >=
+          +(state.startAfter ?? 0);
+
+      if (shouldSetStartPoint) {
+        dispatch({
+          type: 'set',
+          value: {startPoint: event.nativeEvent.coordinate},
+        });
+      }
+      dispatch({
+        type: 'watch',
+        value: event.nativeEvent.coordinate,
+        newLapAccuracy,
+        newLap: shouldSetStartPoint,
+      });
     },
-    [dispatch, isInit],
+    [
+      dispatch,
+      isInit,
+      newLapAccuracy,
+      state.preStartPoint,
+      state.startAfter,
+      state.startPoint,
+    ],
   );
+
   return (
     <>
       <MapContainer>
         <Map
-          userLocationPriority={settings.accuracy}
+          userLocationPriority={accuracy}
           userLocationUpdateInterval={0}
           userLocationFastestInterval={0}
           showsUserLocation
@@ -100,20 +127,20 @@ export const Race: FC = () => {
           <Polyline
             strokeWidth={5}
             strokeColor="rgba(0,0,0,0.5)"
-            coordinates={race.path.map(value => ({
+            coordinates={state.path.map(value => ({
               latitude: value?.latitude ?? 0,
               longitude: value?.longitude ?? 0,
             }))}
           />
-          {race.startPoint ? (
-            <Marker coordinate={race.startPoint} image={startMarker} />
+          {state.startPoint ? (
+            <Marker coordinate={state.startPoint} image={startMarker} />
           ) : null}
         </Map>
       </MapContainer>
       <Content>
         <Info>
           <InfoRow>
-            <Lap>{race?.lap ? `Круг ${race.lap}` : 'Приготовьтесь'}</Lap>
+            <Lap>{state?.lap ? `Круг ${state.lap}` : 'Приготовьтесь'}</Lap>
             <Timer />
           </InfoRow>
           <InfoRow>

@@ -6,33 +6,28 @@ import {DEFAULT_STORE} from './DefaultStore';
 
 const newLap = (state: Store) => ({
   ...state,
-  race: {
-    ...state.race,
-    path: [],
-    maxSpeed: 0,
-    minSpeed: -1,
-    averageSpeed: 0,
-    distance: 0,
-    lap: (state.race.lap ?? 0) + 1,
-    lapStartTime: Date.now(),
-    laps: state.race.lap
-      ? [
-          {
-            lapNumber: state.race.lap,
-            path: state.race.path,
-            distance: state.race.distance,
-            maxSpeed: state.race.maxSpeed,
-            minSpeed: state.race.minSpeed,
-            averageSpeed: state.race.averageSpeed,
-            startTime: state.race.lapStartTime,
-            time: state.race.lapStartTime
-              ? Date.now() - state.race.lapStartTime
-              : 0,
-          },
-          ...state.race.laps,
-        ]
-      : state.race.laps,
-  },
+  path: [],
+  maxSpeed: 0,
+  minSpeed: -1,
+  averageSpeed: 0,
+  distance: 0,
+  lap: (state.lap ?? 0) + 1,
+  lapStartTime: Date.now(),
+  laps: state.lap
+    ? [
+        {
+          lapNumber: state.lap,
+          path: state.path,
+          distance: state.distance,
+          maxSpeed: state.maxSpeed,
+          minSpeed: state.minSpeed,
+          averageSpeed: state.averageSpeed,
+          startTime: state.lapStartTime,
+          time: state.lapStartTime ? Date.now() - state.lapStartTime : 0,
+        },
+        ...state.laps,
+      ]
+    : state.laps,
 });
 
 const update = (
@@ -41,31 +36,28 @@ const update = (
   cpaValue?: TimeDistance,
 ) => {
   const distanceToPrevCoords =
-    state.race?.coords && value ? distanceTo(state.race?.coords, value) : 0;
-  const time = Date.now() - (state.race.lapStartTime ?? Date.now());
+    state?.coords && value ? distanceTo(state?.coords, value) : 0;
+  const time = Date.now() - (state.lapStartTime ?? Date.now());
   const timeInSeconds = time / 1000;
-  const distance = state.race.distance + distanceToPrevCoords;
+  const distance = state.distance + distanceToPrevCoords;
 
   return {
     ...state,
-    race: {
-      ...state.race,
-      cpa: cpaValue,
-      coords: value,
-      curSpeed: value?.speed ?? 0,
-      ...(state.race.lap
-        ? {
-            maxSpeed: Math.max(state.race.maxSpeed, value?.speed ?? 0),
-            minSpeed:
-              state.race.minSpeed === -1
-                ? value?.speed ?? -1
-                : Math.min(state.race.minSpeed, value?.speed ?? -1),
-            averageSpeed: timeInSeconds > 0 ? distance / timeInSeconds : 0,
-            path: [...state.race.path, value],
-            distance,
-          }
-        : {}),
-    },
+    cpa: cpaValue,
+    coords: value,
+    curSpeed: value?.speed ?? 0,
+    ...(state.lap
+      ? {
+          maxSpeed: Math.max(state.maxSpeed, value?.speed ?? 0),
+          minSpeed:
+            state.minSpeed === -1
+              ? value?.speed ?? -1
+              : Math.min(state.minSpeed, value?.speed ?? -1),
+          averageSpeed: timeInSeconds > 0 ? distance / timeInSeconds : 0,
+          path: [...state.path, value],
+          distance,
+        }
+      : {}),
   };
 };
 
@@ -75,7 +67,7 @@ export const reducer: Reducer<Store, Action> = (state, action) => {
       return {...state, ...action.value};
 
     case 'watch':
-      if (!action.value || !state.race.startPoint) {
+      if (!action.value || !state.startPoint) {
         return state;
       }
       const cpaValue = cpa(
@@ -88,25 +80,25 @@ export const reducer: Reducer<Store, Action> = (state, action) => {
           heading: action.value.heading,
         },
         {
-          location: state.race.startPoint,
+          location: state.startPoint,
           speed: 0,
           heading: 0,
         },
       );
 
       const isAtStart =
-        cpaValue.distance <= state.settings.newLapAccuracy &&
+        cpaValue.distance <= action.newLapAccuracy &&
         cpaValue.time <= 0 &&
-        (state.race.cpa?.time ?? 0) > 0;
+        (state.cpa?.time ?? 0) > 0;
 
-      if (isAtStart) {
+      if (isAtStart || action.newLap) {
         return update(newLap(state), action.value, cpaValue);
       }
 
       return update(state, action.value, cpaValue);
 
     case 'reset':
-      return {...state, race: DEFAULT_STORE.race};
+      return DEFAULT_STORE;
 
     default:
       return state;

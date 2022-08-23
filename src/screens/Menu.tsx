@@ -1,9 +1,10 @@
-import styled from '@emotion/native';
-import React, {FC, useCallback, useContext, useState} from 'react';
+import React, {FC, useCallback, useEffect, useState} from 'react';
 import {Pressable} from 'react-native';
-import {Button, Chip, InputWithUnit} from '../components';
 import {useNavigate} from 'react-router';
-import {StoreContext} from '../store/Store.context';
+import styled from '@emotion/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+import {Button, Chip, InputWithUnit} from '../components';
 
 const Screen = styled.ScrollView`
   background: #fff;
@@ -42,25 +43,36 @@ const InputContainer = styled.View`
   margin-top: 16px;
   width: 120px;
 `;
+type Theme = 'light' | 'dark' | 'system';
+type Accuracy = 'low' | 'balanced' | 'high';
+
 export const Menu: FC = () => {
   const navigate = useNavigate();
-  const {
-    state: {settings},
-    dispatch,
-  } = useContext(StoreContext);
-  const [theme, setTheme] = useState(settings.theme);
-  const [accuracy, setAccuracy] = useState(settings.accuracy);
-  const [newLapAccuracy, setNewLapAccuracy] = useState(
-    `${settings.newLapAccuracy}`,
-  );
+  const [theme, setTheme] = useState<Theme>();
+  const [accuracy, setAccuracy] = useState<Accuracy>();
+  const [newLapAccuracy, setNewLapAccuracy] = useState<string>();
 
-  const save = useCallback(() => {
-    dispatch({
-      type: 'set',
-      value: {settings: {theme, accuracy, newLapAccuracy: +newLapAccuracy}},
-    });
+  useEffect(() => {
+    AsyncStorage.getItem('theme').then(value =>
+      setTheme((value ?? 'system') as Theme),
+    );
+    AsyncStorage.getItem('accuracy').then(value =>
+      setAccuracy((value ?? 'balanced') as Accuracy),
+    );
+    AsyncStorage.getItem('newLapAccuracy').then(value =>
+      setNewLapAccuracy((value ?? 5) as string),
+    );
+  }, []);
+
+  const save = useCallback(async () => {
+    await AsyncStorage.multiSet([
+      ['theme', theme as Theme],
+      ['accuracy', accuracy as Accuracy],
+      ['newLapAccuracy', newLapAccuracy as string],
+    ]);
+
     navigate('/');
-  }, [accuracy, dispatch, navigate, newLapAccuracy, theme]);
+  }, [accuracy, navigate, newLapAccuracy, theme]);
 
   return (
     <Screen>
@@ -117,13 +129,15 @@ export const Menu: FC = () => {
             unit="метров"
             keyboardType="numeric"
             onChange={event => setNewLapAccuracy(event.nativeEvent.text)}
-            error={isNaN(+newLapAccuracy) ? 'Это не число :(' : undefined}
+            error={
+              isNaN(+(newLapAccuracy ?? 5)) ? 'Это не число :(' : undefined
+            }
           />
         </InputContainer>
       </Section>
 
       <Section withoutBorder>
-        <Button onPress={save} disabled={isNaN(+newLapAccuracy)}>
+        <Button onPress={save} disabled={isNaN(+(newLapAccuracy ?? 5))}>
           Готово
         </Button>
       </Section>

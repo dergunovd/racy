@@ -18,15 +18,13 @@ const Lap = styled.Text<{best: boolean}>`
 `;
 
 export const Laps: FC = () => {
-  const {
-    state: {race},
-  } = useContext(StoreContext);
+  const {state} = useContext(StoreContext);
 
-  const bestTime = useMemo(() => getBestLap(race.laps)?.time, [race.laps]);
+  const bestTime = useMemo(() => getBestLap(state.laps)?.time, [state.laps]);
 
   return (
     <Container>
-      {race.laps.map(lap => (
+      {state.laps.map(lap => (
         <Lap best={lap.time === bestTime} key={lap.lapNumber}>
           круг {lap.lapNumber} — {timeFormatter(lap.time)}
         </Lap>

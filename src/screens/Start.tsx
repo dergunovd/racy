@@ -13,6 +13,7 @@ import MapView, {
 // @ts-expect-error types
 import startMarker from '../images/start-marker.png';
 import {StoreContext} from '../store/Store.context';
+import {useStoreKey} from '../hooks';
 
 const MapContainer = styled.View`
   position: absolute;
@@ -31,21 +32,21 @@ const ButtonContainer = styled.View`
   flex-direction: row;
   align-items: center;
 `;
+
 const Menu = styled.Pressable`
   padding: 12px;
   margin-right: 16px;
 `;
+
 export const Start: FC = () => {
   const navigate = useNavigate();
   const [showSettings, setShowSettings] = useState(false);
 
   const [isInit, setInit] = useState(false);
   const map = useRef<MapView | null>();
+  const accuracy = useStoreKey('accuracy');
 
-  const {
-    state: {settings, race},
-    dispatch,
-  } = useContext(StoreContext);
+  const {state, dispatch} = useContext(StoreContext);
 
   const watchSuccess = useCallback(
     (event: UserLocationChangeEvent) => {
@@ -59,6 +60,10 @@ export const Start: FC = () => {
         });
         setInit(true);
       }
+      dispatch({
+        type: 'set',
+        value: {preStartPoint: event.nativeEvent.coordinate},
+      });
     },
     [isInit],
   );
@@ -67,21 +72,21 @@ export const Start: FC = () => {
     (event: LongPressEvent | MarkerDragStartEndEvent) => {
       dispatch({
         type: 'set',
-        value: {race: {...race, startPoint: event.nativeEvent.coordinate}},
+        value: {...state, startPoint: event.nativeEvent.coordinate},
       });
     },
-    [dispatch, race],
+    [dispatch, state],
   );
 
   const toggleShow = useCallback(() => {
     setShowSettings(prev => !prev);
   }, []);
-
+  console.log(state);
   return (
     <>
       <MapContainer>
         <Map
-          userLocationPriority={settings.accuracy}
+          userLocationPriority={accuracy}
           userLocationUpdateInterval={0}
           userLocationFastestInterval={0}
           showsUserLocation
@@ -91,11 +96,11 @@ export const Start: FC = () => {
           innerRef={ref => {
             map.current = ref;
           }}>
-          {race.startPoint ? (
+          {state.startPoint ? (
             <MarkerAnimated
               draggable
               onDragEnd={setStartPointHandler}
-              coordinate={race.startPoint}
+              coordinate={state.startPoint}
               image={startMarker}
             />
           ) : null}
@@ -111,23 +116,23 @@ export const Start: FC = () => {
             iconOnPress={toggleShow}
             icon={<DropdownIcon />}
             text={
-              race.startPoint
+              state.startPoint
                 ? 'Старт в точке'
-                : race.startAfter
-                ? `Старт через ${race.startAfter}м`
+                : state.startAfter
+                ? `Старт через ${state.startAfter}м`
                 : 'Старт сейчас'
             }
           />
         </ButtonContainer>
         {showSettings ? (
           <Picker
-            value={race.startAfter ?? 0}
-            onPress={startAfter => {
+            value={state.startAfter ?? 0}
+            onPress={startAfter =>
               dispatch({
                 type: 'set',
-                value: {race: {...race, startAfter}},
-              });
-            }}
+                value: {...state, startAfter},
+              })
+            }
             items={[0, 10, 15, 30, 50, 75, 100]}
           />
         ) : null}

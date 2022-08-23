@@ -1,5 +1,6 @@
 import React, {FC, useContext, useMemo} from 'react';
 import styled from '@emotion/native';
+
 import {StoreContext} from '../../../store/Store.context';
 import {msTokmh} from '../../../utils/geolocation';
 import {numberWithSign, speedFormatter} from '../../../utils/formatters';
@@ -10,63 +11,58 @@ const Min = styled.Text`
   font-size: 22px;
   opacity: 0.5;
 `;
-const Average = styled.Text`
+
+const Current = styled.Text`
   font-weight: 400;
   font-size: 32px;
 `;
+
 const Max = styled.Text`
   font-weight: 400;
   font-size: 22px;
   opacity: 0.5;
 `;
-const Delta = styled.Text<{big?: boolean}>`
-  font-size: ${props => (props.big ? '18px' : '12px')};
+
+const Delta = styled.Text`
+  font-size: 12px;
   color: ${props => (+(props?.children ?? 0) < 0 ? '#f53d3d' : '#44DA37')};
   height: 22px;
   vertical-align: top;
 `;
+
 const Section = styled.View`
   margin-top: 12px;
   align-items: center;
 `;
 
 export const Speed: FC = () => {
-  const {
-    state: {race},
-  } = useContext(StoreContext);
+  const {state} = useContext(StoreContext);
 
-  const bestLap = useMemo(() => getBestLap(race.laps), [race.laps]);
+  const bestLap = useMemo(() => getBestLap(state.laps), [state.laps]);
 
   return (
     <>
       <Section>
-        <Min>{speedFormatter(msTokmh(race.minSpeed))}</Min>
+        <Min>
+          {state.minSpeed >= 0 ? speedFormatter(msTokmh(state.minSpeed)) : 0}
+        </Min>
         {bestLap && (
           <Delta>
             {numberWithSign(
-              +speedFormatter(msTokmh(race.minSpeed - bestLap.minSpeed)),
+              +speedFormatter(msTokmh(state.minSpeed - bestLap.minSpeed)),
             )}
           </Delta>
         )}
       </Section>
       <Section>
-        <Average>{speedFormatter(msTokmh(race.averageSpeed))} км/ч</Average>
-        {bestLap && (
-          <Delta big>
-            {numberWithSign(
-              +speedFormatter(
-                msTokmh(race.averageSpeed - bestLap.averageSpeed),
-              ),
-            )}
-          </Delta>
-        )}
+        <Current>{speedFormatter(msTokmh(state.curSpeed))} км/ч</Current>
       </Section>
       <Section>
-        <Max>{speedFormatter(msTokmh(race.maxSpeed))}</Max>
+        <Max>{speedFormatter(msTokmh(state.maxSpeed))}</Max>
         {bestLap && (
           <Delta>
             {numberWithSign(
-              +speedFormatter(msTokmh(race.maxSpeed - bestLap.maxSpeed)),
+              +speedFormatter(msTokmh(state.maxSpeed - bestLap.maxSpeed)),
             )}
           </Delta>
         )}

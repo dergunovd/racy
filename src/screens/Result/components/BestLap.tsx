@@ -1,6 +1,7 @@
 import React, {FC, useContext, useMemo} from 'react';
 import {View} from 'react-native';
 import styled from '@emotion/native';
+
 import {StoreContext} from '../../../store/Store.context';
 import {getBestLap} from '../../../utils/race';
 import {timeFormatter} from '../../../utils/formatters';
@@ -18,11 +19,9 @@ const Time = styled.Text`
 `;
 
 export const BestLap: FC = () => {
-  const {
-    state: {race},
-  } = useContext(StoreContext);
+  const {state} = useContext(StoreContext);
 
-  const bestLap = useMemo(() => getBestLap(race.laps), [race.laps]);
+  const bestLap = useMemo(() => getBestLap(state.laps), [state.laps]);
 
   return (
     <View>
