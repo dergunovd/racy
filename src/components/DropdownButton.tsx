@@ -5,7 +5,7 @@ import {GestureResponderEvent} from 'react-native';
 import {BoldText} from './BoldText';
 
 const Button = styled.Pressable`
-  background-color: #313131;
+  background-color: ${props => props.theme.accentColor};
   padding: 4px 0;
   border-radius: 4px;
   flex-direction: row;
@@ -16,12 +16,13 @@ const Button = styled.Pressable`
 const Text = styled(BoldText)`
   padding: 16px 0;
   margin: 0 auto;
+  color: ${props => props.theme.bgColor};
 `;
 
 const Icon = styled.Pressable`
   padding: 16px;
   justify-self: flex-end;
-  border-left-color: #fdfdfd;
+  border-left-color: ${props => props.theme.bgColor};
   border-left-width: 1px;
   justify-content: center;
 `;

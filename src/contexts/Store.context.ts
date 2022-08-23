@@ -1,6 +1,6 @@
 import {createContext} from 'react';
-import {DEFAULT_STORE} from './DefaultStore';
-import {Action} from './Store.types';
+import {DEFAULT_STORE} from '../store/DefaultStore';
+import {Action} from '../store/Store.types';
 
 export const StoreContext = createContext({
   state: DEFAULT_STORE,

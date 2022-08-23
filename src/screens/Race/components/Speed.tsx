@@ -1,7 +1,7 @@
 import React, {FC, useContext, useMemo} from 'react';
 import styled from '@emotion/native';
 
-import {StoreContext} from '../../../store/Store.context';
+import {StoreContext} from '../../../contexts';
 import {msTokmh} from '../../../utils/geolocation';
 import {numberWithSign, speedFormatter} from '../../../utils/formatters';
 import {getBestLap} from '../../../utils/race';
@@ -10,22 +10,28 @@ const Min = styled.Text`
   font-weight: 400;
   font-size: 22px;
   opacity: 0.5;
+  color: ${props => props.theme.accentColor};
 `;
 
 const Current = styled.Text`
   font-weight: 400;
   font-size: 32px;
+  color: ${props => props.theme.accentColor};
 `;
 
 const Max = styled.Text`
   font-weight: 400;
   font-size: 22px;
   opacity: 0.5;
+  color: ${props => props.theme.accentColor};
 `;
 
 const Delta = styled.Text`
   font-size: 12px;
-  color: ${props => (+(props?.children ?? 0) < 0 ? '#f53d3d' : '#44DA37')};
+  color: ${props =>
+    +(props?.children ?? 0) < 0
+      ? props.theme.negativeColor
+      : props.theme.accentColor50};
   height: 22px;
   vertical-align: top;
 `;

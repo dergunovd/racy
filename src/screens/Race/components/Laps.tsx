@@ -1,7 +1,7 @@
 import React, {FC, useContext, useMemo} from 'react';
 import styled from '@emotion/native';
 
-import {StoreContext} from '../../../store/Store.context';
+import {StoreContext} from '../../../contexts';
 import {timeFormatter} from '../../../utils/formatters';
 import {getBestLap} from '../../../utils/race';
 
@@ -13,7 +13,8 @@ const Container = styled.ScrollView`
 const Lap = styled.Text<{best: boolean}>`
   font-weight: 400;
   font-size: 18px;
-  color: ${props => (props.best ? '#44DA37' : 'rgba(253, 253, 253, 0.5);')};
+  color: ${props =>
+    props.best ? props.theme.positiveColor : props.theme.accentColor50};
   margin-bottom: 8px;
 `;
 
@@ -24,9 +25,9 @@ export const Laps: FC = () => {
 
   return (
     <Container>
-      {state.laps.map(lap => (
-        <Lap best={lap.time === bestTime} key={lap.lapNumber}>
-          круг {lap.lapNumber} — {timeFormatter(lap.time)}
+      {state.laps.map(({time, lapNumber}) => (
+        <Lap best={time === bestTime} key={lapNumber}>
+          круг {lapNumber} — {timeFormatter(time)}
         </Lap>
       ))}
     </Container>

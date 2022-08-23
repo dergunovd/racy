@@ -1,14 +1,14 @@
 import React, {FC, useContext} from 'react';
+import {useNavigate} from 'react-router';
 import styled from '@emotion/native';
 
-import {Laps} from '../Race/components/Laps';
+import {Laps} from '../Race/components';
 import {BestLap} from './components/BestLap';
 import {Button} from '../../components';
-import {useNavigate} from 'react-router';
-import {StoreContext} from '../../store/Store.context';
+import {StoreContext} from '../../contexts';
 
 const Content = styled.ScrollView`
-  background: #313131;
+  background: ${props => props.theme.bgColor};
   padding: 16px 20px;
   width: 100%;
   height: 100%;
@@ -23,13 +23,12 @@ const Finish = styled.Text`
   font-style: italic;
   font-weight: 400;
   font-size: 32px;
-  color: #fdfdfd;
+  color: ${props => props.theme.accentColor50};
   opacity: 0.5;
 `;
 
 const ButtonWrap = styled.View`
   justify-self: flex-end;
-  //align-self: flex-end;
 `;
 
 export const Result: FC = () => {

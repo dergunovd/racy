@@ -5,7 +5,9 @@ import styled from '@emotion/native';
 import {MediumText} from './MediumText';
 
 const Body = styled.View<{isInvalid?: boolean}>`
-  border: 1px solid ${props => (props.isInvalid ? '#F53D3D' : '#313131')};
+  border-width: 1px;
+  border-color: ${props =>
+    props.isInvalid ? props.theme.negativeColor : props.theme.accentColor50};
   border-radius: 4px;
   flex-direction: row;
 `;
@@ -15,18 +17,18 @@ const TextInput = styled.TextInput`
   font-size: 14px;
   flex-grow: 1;
   padding: 0 16px;
-  color: #313131;
+  color: ${props => props.theme.accentColor};
 `;
 
 const Unit = styled(MediumText)`
-  color: #313131;
+  color: ${props => props.theme.accentColor};
   border-radius: 4px;
   padding: 8px;
-  background-color: rgb(206, 206, 206);
+  background-color: ${props => props.theme.bgColor};
 `;
 
 const Error = styled(MediumText)`
-  color: #f53d3d;
+  color: ${props => props.theme.negativeColor};
   font-size: 10px;
 `;
 

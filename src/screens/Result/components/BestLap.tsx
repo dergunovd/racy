@@ -2,20 +2,20 @@ import React, {FC, useContext, useMemo} from 'react';
 import {View} from 'react-native';
 import styled from '@emotion/native';
 
-import {StoreContext} from '../../../store/Store.context';
+import {StoreContext} from '../../../contexts';
 import {getBestLap} from '../../../utils/race';
 import {timeFormatter} from '../../../utils/formatters';
 
 const Title = styled.Text`
   font-weight: 400;
   font-size: 32px;
-  color: #fdfdfd;
+  color: ${props => props.theme.accentColor};
 `;
 
 const Time = styled.Text`
   font-weight: 400;
   font-size: 32px;
-  color: #44da37;
+  color: ${props => props.theme.positiveColor};
 `;
 
 export const BestLap: FC = () => {

@@ -11,11 +11,13 @@ import styled from '@emotion/native';
 
 // @ts-expect-error types
 import startMarker from '../../images/start-marker.png';
-import {StoreContext} from '../../store/Store.context';
+import {StoreContext} from '../../contexts';
 import {Map} from '../../components';
 import {StopIcon} from '../../components/icons';
 import {Laps, Speed, Timer} from './components';
 import {useStoreKey} from '../../hooks';
+import {ITheme} from '../../themes/Theme.interface';
+import {ThemeContext} from '@emotion/react';
 
 const MapContainer = styled.View`
   position: absolute;
@@ -30,7 +32,7 @@ const Content = styled.View`
 `;
 
 const Info = styled.View`
-  background: #313131;
+  background: ${props => props.theme.bgColor};
   border-radius: 4px 4px 0 0;
   padding: 16px 20px;
   height: 30%;
@@ -46,11 +48,11 @@ const InfoRow = styled.View`
 const Lap = styled.Text`
   font-weight: 400;
   font-size: 32px;
-  color: #fdfdfd;
+  color: ${props => props.theme.accentColor};
 `;
 
 const Stop = styled.Pressable`
-  background: #fff;
+  background: ${props => props.theme.accentColor};
   border-radius: 32px;
   width: 64px;
   height: 64px;
@@ -66,8 +68,7 @@ export const Race: FC = () => {
   const map = useRef<MapView | null>();
   const accuracy = useStoreKey('accuracy');
   const newLapAccuracy = useStoreKey('newLapAccuracy');
-
-  console.log(state);
+  const theme = useContext(ThemeContext);
 
   const watchSuccess = useCallback(
     (event: UserLocationChangeEvent) => {
@@ -115,6 +116,7 @@ export const Race: FC = () => {
     <>
       <MapContainer>
         <Map
+          customMapStyle={(theme as ITheme).mapStyle}
           userLocationPriority={accuracy}
           userLocationUpdateInterval={0}
           userLocationFastestInterval={0}
@@ -126,7 +128,7 @@ export const Race: FC = () => {
           }}>
           <Polyline
             strokeWidth={5}
-            strokeColor="rgba(0,0,0,0.5)"
+            strokeColor={(theme as ITheme).accentColor50}
             coordinates={state.path.map(value => ({
               latitude: value?.latitude ?? 0,
               longitude: value?.longitude ?? 0,
@@ -148,7 +150,7 @@ export const Race: FC = () => {
           </InfoRow>
           <InfoRow>
             <Laps />
-            <Stop onPress={() => navigate('/result')}>
+            <Stop onPress={() => navigate('/result', {replace: true})}>
               <StopIcon />
             </Stop>
           </InfoRow>

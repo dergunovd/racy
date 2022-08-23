@@ -10,10 +10,12 @@ import MapView, {
   MarkerDragStartEndEvent,
   UserLocationChangeEvent,
 } from 'react-native-maps';
+import {ThemeContext} from '@emotion/react';
 // @ts-expect-error types
 import startMarker from '../images/start-marker.png';
-import {StoreContext} from '../store/Store.context';
+import {StoreContext} from '../contexts';
 import {useStoreKey} from '../hooks';
+import {ITheme} from '../themes/Theme.interface';
 
 const MapContainer = styled.View`
   position: absolute;
@@ -41,7 +43,7 @@ const Menu = styled.Pressable`
 export const Start: FC = () => {
   const navigate = useNavigate();
   const [showSettings, setShowSettings] = useState(false);
-
+  const theme = useContext(ThemeContext);
   const [isInit, setInit] = useState(false);
   const map = useRef<MapView | null>();
   const accuracy = useStoreKey('accuracy');
@@ -65,7 +67,7 @@ export const Start: FC = () => {
         value: {preStartPoint: event.nativeEvent.coordinate},
       });
     },
-    [isInit],
+    [dispatch, isInit],
   );
 
   const setStartPointHandler = useCallback(
@@ -81,11 +83,12 @@ export const Start: FC = () => {
   const toggleShow = useCallback(() => {
     setShowSettings(prev => !prev);
   }, []);
-  console.log(state);
+
   return (
     <>
       <MapContainer>
         <Map
+          customMapStyle={(theme as ITheme).mapStyle}
           userLocationPriority={accuracy}
           userLocationUpdateInterval={0}
           userLocationFastestInterval={0}
@@ -109,12 +112,12 @@ export const Start: FC = () => {
       <Content>
         <ButtonContainer>
           <Menu onPress={() => navigate('/menu')}>
-            <BurgerIcon />
+            <BurgerIcon fill={(theme as ITheme).accentColor} />
           </Menu>
           <DropdownButton
             buttonOnPress={() => navigate('/race')}
             iconOnPress={toggleShow}
-            icon={<DropdownIcon />}
+            icon={<DropdownIcon fill={(theme as ITheme).bgColor} />}
             text={
               state.startPoint
                 ? 'Старт в точке'

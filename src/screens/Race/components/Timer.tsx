@@ -2,12 +2,12 @@ import React, {FC, useContext, useEffect, useRef, useState} from 'react';
 import styled from '@emotion/native';
 
 import {timeFormatter} from '../../../utils/formatters';
-import {StoreContext} from '../../../store/Store.context';
+import {StoreContext} from '../../../contexts';
 
 const TimerText = styled.Text`
   font-weight: 400;
   font-size: 32px;
-  color: #fdfdfd;
+  color: ${props => props.theme.accentColor50};
 `;
 
 export const Timer: FC = () => {
