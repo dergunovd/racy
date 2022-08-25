@@ -3,7 +3,7 @@ import {NativeRouter, Route, Routes, useNavigate} from 'react-router-native';
 import {useBackHandler} from '@react-native-community/hooks';
 import styled from '@emotion/native';
 
-import {History, Menu, Race, Result, Start} from './screens';
+import {History, HistoryList, Menu, Race, Result, Start} from './screens';
 import {StoreProvider} from './store/StoreProvider';
 import {AppThemeProvider} from './themes/ThemeProvider';
 
@@ -34,7 +34,8 @@ const App = () => (
               <Route path="/menu" element={<Menu />} />
               <Route path="/race" element={<Race />} />
               <Route path="/result" element={<Result />} />
-              <Route path="/history" element={<History />} />
+              <Route path="/history" element={<HistoryList />} />
+              <Route path="/history/:date" element={<History />} />
             </Routes>
           </BackPressHandler>
         </NativeRouter>

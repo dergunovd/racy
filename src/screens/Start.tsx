@@ -46,7 +46,9 @@ export const Start: FC = () => {
   const theme = useContext(ThemeContext);
   const [isInit, setInit] = useState(false);
   const map = useRef<MapView | null>();
-  const accuracy = useStoreKey('accuracy');
+  const accuracy = useStoreKey<'balanced' | 'high' | 'low' | 'passive'>(
+    'accuracy',
+  );
 
   const {state, dispatch} = useContext(StoreContext);
 

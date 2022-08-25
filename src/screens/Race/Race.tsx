@@ -1,6 +1,7 @@
 import React, {FC, useCallback, useContext, useRef, useState} from 'react';
 import {useNavigate} from 'react-router';
 import MapView, {
+  LatLng,
   Marker,
   Polyline,
   UserLocationChangeEvent,
@@ -18,6 +19,7 @@ import {Laps, Speed, Timer} from './components';
 import {useStoreKey} from '../../hooks';
 import {ITheme} from '../../themes/Theme.interface';
 import {ThemeContext} from '@emotion/react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const MapContainer = styled.View`
   position: absolute;
@@ -43,6 +45,7 @@ const InfoRow = styled.View`
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
+  height: 80px;
 `;
 
 const Lap = styled.Text`
@@ -63,11 +66,13 @@ const Stop = styled.Pressable`
 export const Race: FC = () => {
   const {state, dispatch} = useContext(StoreContext);
   const navigate = useNavigate();
-
   const [isInit, setInit] = useState(false);
   const map = useRef<MapView | null>();
-  const accuracy = useStoreKey('accuracy');
-  const newLapAccuracy = useStoreKey('newLapAccuracy');
+  const races = useStoreKey<Array<any>>('races');
+  const accuracy = useStoreKey<'balanced' | 'high' | 'low' | 'passive'>(
+    'accuracy',
+  );
+  const newLapAccuracy = useStoreKey<string>('newLapAccuracy');
   const theme = useContext(ThemeContext);
 
   const watchSuccess = useCallback(
@@ -98,7 +103,7 @@ export const Race: FC = () => {
       dispatch({
         type: 'watch',
         value: event.nativeEvent.coordinate,
-        newLapAccuracy,
+        newLapAccuracy: +(newLapAccuracy ?? 5),
         newLap: shouldSetStartPoint,
       });
     },
@@ -111,6 +116,23 @@ export const Race: FC = () => {
       state.startPoint,
     ],
   );
+
+  const endRace = useCallback(async () => {
+    if (state.laps.length) {
+      await AsyncStorage.setItem(
+        'races',
+        JSON.stringify([
+          ...(races ? races : []),
+          {
+            date: Date.now(),
+            startPoint: state.startPoint,
+            laps: state.laps,
+          },
+        ]),
+      );
+    }
+    navigate('/result', {replace: true});
+  }, [navigate, races, state.laps, state.startPoint]);
 
   return (
     <>
@@ -150,7 +172,7 @@ export const Race: FC = () => {
           </InfoRow>
           <InfoRow>
             <Laps />
-            <Stop onPress={() => navigate('/result', {replace: true})}>
+            <Stop onPress={endRace}>
               <StopIcon />
             </Stop>
           </InfoRow>

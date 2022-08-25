@@ -14,8 +14,8 @@ import {lightTheme} from './light';
 import {darkTheme} from './dark';
 
 export const AppThemeProvider: FC<PropsWithChildren> = ({children}) => {
-  const [theme, setTheme] = useState('dark');
-  const themeFromStore = useStoreKey('theme');
+  const [theme, setTheme] = useState<'light' | 'dark' | 'system'>('dark');
+  const themeFromStore = useStoreKey<'light' | 'dark' | 'system'>('theme');
   const systemTheme = useColorScheme();
 
   useEffect(() => {

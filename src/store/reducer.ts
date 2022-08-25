@@ -36,7 +36,7 @@ const update = (
   cpaValue?: TimeDistance,
 ) => {
   const distanceToPrevCoords =
-    state?.coords && value ? distanceTo(state?.coords, value) : 0;
+    state?.coords && value ? distanceTo(state.coords, value) : 0;
   const time = Date.now() - (state.lapStartTime ?? Date.now());
   const timeInSeconds = time / 1000;
   const distance = state.distance + distanceToPrevCoords;

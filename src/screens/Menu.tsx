@@ -6,6 +6,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import {Button, Chip, InputWithUnit} from '../components';
 import {ThemeContext} from '../contexts';
+import {useStoreKey} from '../hooks';
+import {HistoryRace} from '../types';
+import {declOfNum} from '../utils/formatters';
 
 const Screen = styled.ScrollView`
   background: ${props => props.theme.bgColor};
@@ -53,6 +56,7 @@ export const Menu: FC = () => {
   const [theme, setTheme] = useState<Theme>();
   const [accuracy, setAccuracy] = useState<Accuracy>();
   const [newLapAccuracy, setNewLapAccuracy] = useState<string>();
+  const races = useStoreKey<Array<HistoryRace>>('races', []);
 
   useEffect(() => {
     AsyncStorage.getItem('theme').then(value =>
@@ -82,7 +86,10 @@ export const Menu: FC = () => {
       <Pressable onPress={() => navigate('/history')}>
         <Section>
           <Title>История записей</Title>
-          <SubTitle>15 записей</SubTitle>
+          <SubTitle>
+            {races?.length ?? 0}{' '}
+            {declOfNum(races?.length ?? 0, ['запись', 'записи', 'записей'])}
+          </SubTitle>
         </Section>
       </Pressable>
 

@@ -5,6 +5,7 @@ import styled from '@emotion/native';
 import {StoreContext} from '../../../contexts';
 import {getBestLap} from '../../../utils/race';
 import {timeFormatter} from '../../../utils/formatters';
+import {Lap, Store} from '../../../store/Store.types';
 
 const Title = styled.Text`
   font-weight: 400;
@@ -18,10 +19,12 @@ const Time = styled.Text`
   color: ${props => props.theme.positiveColor};
 `;
 
-export const BestLap: FC = () => {
-  const {state} = useContext(StoreContext);
+interface Props {
+  laps: Store['laps'];
+}
 
-  const bestLap = useMemo(() => getBestLap(state.laps), [state.laps]);
+export const BestLap: FC<Props> = ({laps}) => {
+  const bestLap = useMemo(() => getBestLap(laps), [laps]);
 
   return (
     <View>

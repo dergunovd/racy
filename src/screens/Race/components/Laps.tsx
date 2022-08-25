@@ -6,9 +6,9 @@ import {timeFormatter} from '../../../utils/formatters';
 import {getBestLap} from '../../../utils/race';
 
 const Container = styled.ScrollView`
-  height: 80px;
   margin-right: 24px;
   margin-top: 32px;
+  flex-grow: 1;
 `;
 const Lap = styled.Text<{best: boolean}>`
   font-weight: 400;

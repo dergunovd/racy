@@ -1,10 +1,18 @@
-import React, {FC, useContext, useMemo} from 'react';
-import styled from '@emotion/native';
-
-import {StoreContext} from '../../../contexts';
-import {msTokmh} from '../../../utils/geolocation';
+import React, {FC} from 'react';
 import {numberWithSign, speedFormatter} from '../../../utils/formatters';
-import {getBestLap} from '../../../utils/race';
+import {msTokmh} from '../../../utils/geolocation';
+import styled from '@emotion/native/dist/emotion-native.cjs';
+import {Lap} from '../../../store/Store.types';
+
+const SpeedWrap = styled.View`
+  flex-direction: row;
+  justify-content: space-between;
+`;
+
+const Title = styled.Text`
+  margin-top: 24px;
+  color: ${props => props.theme.accentColor50};
+`;
 
 const Min = styled.Text`
   font-weight: 400;
@@ -41,38 +49,43 @@ const Section = styled.View`
   align-items: center;
 `;
 
-export const Speed: FC = () => {
-  const {state} = useContext(StoreContext);
+interface Props {
+  bestLap?: Lap;
+  lap: Lap;
+}
 
-  const bestLap = useMemo(() => getBestLap(state.laps), [state.laps]);
+export const Speed: FC<Props> = ({bestLap, lap}) => (
+  <>
+    <Title>Скорость</Title>
 
-  return (
-    <>
+    <SpeedWrap>
       <Section>
         <Min>
-          {state.minSpeed >= 0 ? speedFormatter(msTokmh(state.minSpeed)) : 0}
+          {lap.minSpeed >= 0 ? speedFormatter(msTokmh(lap.minSpeed)) : 0}
         </Min>
         {bestLap && (
           <Delta>
             {numberWithSign(
-              +speedFormatter(msTokmh(state.minSpeed - bestLap.minSpeed)),
+              +speedFormatter(msTokmh(lap.minSpeed - bestLap.minSpeed)),
             )}
           </Delta>
         )}
       </Section>
       <Section>
-        <Current>{speedFormatter(msTokmh(state.curSpeed))} км/ч</Current>
+        <Current>
+          {speedFormatter(msTokmh(lap.distance / lap.time))} км/ч
+        </Current>
       </Section>
       <Section>
-        <Max>{speedFormatter(msTokmh(state.maxSpeed))}</Max>
+        <Max>{speedFormatter(msTokmh(lap.maxSpeed))}</Max>
         {bestLap && (
           <Delta>
             {numberWithSign(
-              +speedFormatter(msTokmh(state.maxSpeed - bestLap.maxSpeed)),
+              +speedFormatter(msTokmh(lap.maxSpeed - bestLap.maxSpeed)),
             )}
           </Delta>
         )}
       </Section>
-    </>
-  );
-};
+    </SpeedWrap>
+  </>
+);
