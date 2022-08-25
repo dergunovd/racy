@@ -1,4 +1,4 @@
-package com.racy.newarchitecture.modules;
+package net.dergunov.racy.newarchitecture.modules;
 
 import com.facebook.jni.HybridData;
 import com.facebook.react.ReactPackage;

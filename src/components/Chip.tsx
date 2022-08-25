@@ -6,15 +6,17 @@ import {MediumText} from './MediumText';
 import {Activable} from '../types';
 
 const Pressable = styled.Pressable<Activable>`
-  border: 1px solid #313131;
-  background: ${props => (props.active ? '#313131' : 'transparent')};
+  border: 1px solid ${props => props.theme.accentColor};
+  background: ${props =>
+    props.active ? props.theme.accentColor : 'transparent'};
   padding: 8px 16px;
   justify-content: center;
   align-items: center;
   border-radius: 30px;
 `;
 const Text = styled(MediumText)<Activable>`
-  color: ${props => (props.active ? '#fff' : '#313131')};
+  color: ${props =>
+    props.active ? props.theme.bgColor : props.theme.accentColor};
 `;
 
 export const Chip: FC<PressableProps & {children: string} & Activable> = ({

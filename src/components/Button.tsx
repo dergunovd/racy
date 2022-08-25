@@ -4,11 +4,12 @@ import styled from '@emotion/native';
 import {BoldText} from './BoldText';
 
 const Pressable = styled.Pressable`
-  background: #313131;
+  background: ${props => props.theme.accentColor};
   padding: 20px;
   border-radius: 4px;
   justify-content: center;
   align-items: center;
+  opacity: ${props => (props.disabled ? '0.5' : '1')};
 `;
 
 export const Button: FC<PressableProps & {children: string}> = ({

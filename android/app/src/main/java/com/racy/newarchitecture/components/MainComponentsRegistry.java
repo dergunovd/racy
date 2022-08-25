@@ -1,4 +1,4 @@
-package com.racy.newarchitecture.components;
+package net.dergunov.racy.newarchitecture.components;
 
 import com.facebook.jni.HybridData;
 import com.facebook.proguard.annotations.DoNotStrip;

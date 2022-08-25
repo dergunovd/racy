@@ -1,31 +1,37 @@
-import styled from '@emotion/native';
-import React, {FC, useState} from 'react';
+import React, {FC, useCallback, useContext, useEffect, useState} from 'react';
 import {Pressable} from 'react-native';
-import {Button, Chip, InputWithUnit} from '../components';
 import {useNavigate} from 'react-router';
+import styled from '@emotion/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+import {Button, Chip, InputWithUnit} from '../components';
+import {ThemeContext} from '../contexts';
+import {useStoreKey} from '../hooks';
+import {HistoryRace} from '../types';
+import {declOfNum} from '../utils/formatters';
 
 const Screen = styled.ScrollView`
-  background: #fff;
-  color: #313131;
+  background: ${props => props.theme.bgColor};
+  color: ${props => props.theme.accentColor};
 `;
 
 const Section = styled.View<{withoutBorder?: boolean}>`
   padding: 24px;
-  border-bottom-color: rgba(49, 49, 49, 0.5);
+  border-bottom-color: ${props => props.theme.accentColor50};
   border-bottom-width: ${props => (props.withoutBorder ? '0' : '1px')};
 `;
 
 const Title = styled.Text`
   font-size: 16px;
   font-weight: 600;
-  color: #313131;
+  color: ${props => props.theme.accentColor};
   margin-bottom: 4px;
 `;
 
 const SubTitle = styled.Text`
   font-size: 12px;
   font-weight: 600;
-  color: #313131;
+  color: ${props => props.theme.accentColor};
   opacity: 0.5;
 `;
 
@@ -41,19 +47,49 @@ const InputContainer = styled.View`
   margin-top: 16px;
   width: 120px;
 `;
+type Theme = 'light' | 'dark' | 'system';
+type Accuracy = 'low' | 'balanced' | 'high';
+
 export const Menu: FC = () => {
   const navigate = useNavigate();
-  const [theme, setTheme] = useState<'system' | 'light' | 'dark'>('light');
-  const [accuracy, setAccuracy] = useState<'low' | 'normal' | 'high'>('normal');
+  const {setTheme: setContextTheme} = useContext(ThemeContext);
+  const [theme, setTheme] = useState<Theme>();
+  const [accuracy, setAccuracy] = useState<Accuracy>();
+  const [newLapAccuracy, setNewLapAccuracy] = useState<string>();
+  const races = useStoreKey<Array<HistoryRace>>('races', []);
 
-  const [newLapAccuracy, setNewLapAccuracy] = useState('5');
+  useEffect(() => {
+    AsyncStorage.getItem('theme').then(value =>
+      setTheme((value ?? 'system') as Theme),
+    );
+    AsyncStorage.getItem('accuracy').then(value =>
+      setAccuracy((value ?? 'balanced') as Accuracy),
+    );
+    AsyncStorage.getItem('newLapAccuracy').then(value =>
+      setNewLapAccuracy((value ?? 5) as string),
+    );
+  }, []);
+
+  const save = useCallback(async () => {
+    theme && setContextTheme(theme);
+    await AsyncStorage.multiSet([
+      ['theme', theme as Theme],
+      ['accuracy', accuracy as Accuracy],
+      ['newLapAccuracy', newLapAccuracy as string],
+    ]);
+
+    navigate('/');
+  }, [accuracy, navigate, newLapAccuracy, setContextTheme, theme]);
 
   return (
     <Screen>
-      <Pressable>
+      <Pressable onPress={() => navigate('/history')}>
         <Section>
           <Title>История записей</Title>
-          <SubTitle>15 записей</SubTitle>
+          <SubTitle>
+            {races?.length ?? 0}{' '}
+            {declOfNum(races?.length ?? 0, ['запись', 'записи', 'записей'])}
+          </SubTitle>
         </Section>
       </Pressable>
 
@@ -80,8 +116,8 @@ export const Menu: FC = () => {
             Экономная
           </Chip>
           <Chip
-            active={accuracy === 'normal'}
-            onPress={() => setAccuracy('normal')}>
+            active={accuracy === 'balanced'}
+            onPress={() => setAccuracy('balanced')}>
             Средняя
           </Chip>
           <Chip
@@ -103,13 +139,17 @@ export const Menu: FC = () => {
             unit="метров"
             keyboardType="numeric"
             onChange={event => setNewLapAccuracy(event.nativeEvent.text)}
-            error={isNaN(+newLapAccuracy) ? 'Это не число :(' : undefined}
+            error={
+              isNaN(+(newLapAccuracy ?? 5)) ? 'Это не число :(' : undefined
+            }
           />
         </InputContainer>
       </Section>
 
       <Section withoutBorder>
-        <Button onPress={() => navigate('/')}>Готово</Button>
+        <Button onPress={save} disabled={isNaN(+(newLapAccuracy ?? 5))}>
+          Готово
+        </Button>
       </Section>
     </Screen>
   );
