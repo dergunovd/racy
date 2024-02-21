@@ -61,28 +61,28 @@ export const Speed: FC<Props> = ({bestLap, lap}) => (
     <SpeedWrap>
       <Section>
         <Min>
-          {lap.minSpeed >= 0 ? speedFormatter(msTokmh(lap.minSpeed)) : 0}
+          min {lap.minSpeed >= 0 ? speedFormatter(msTokmh(lap.minSpeed)) : 0} км/ч
         </Min>
         {bestLap && (
           <Delta>
             {numberWithSign(
               +speedFormatter(msTokmh(lap.minSpeed - bestLap.minSpeed)),
-            )}
+            )} км/ч
           </Delta>
         )}
       </Section>
+      {/*<Section>*/}
+      {/*  <Current>*/}
+      {/*    {speedFormatter(msTokmh(lap.distance / lap.time))} км/ч*/}
+      {/*  </Current>*/}
+      {/*</Section>*/}
       <Section>
-        <Current>
-          {speedFormatter(msTokmh(lap.distance / lap.time))} км/ч
-        </Current>
-      </Section>
-      <Section>
-        <Max>{speedFormatter(msTokmh(lap.maxSpeed))}</Max>
+        <Max>max {speedFormatter(msTokmh(lap.maxSpeed))} км/ч</Max>
         {bestLap && (
           <Delta>
             {numberWithSign(
               +speedFormatter(msTokmh(lap.maxSpeed - bestLap.maxSpeed)),
-            )}
+            )} км/ч
           </Delta>
         )}
       </Section>

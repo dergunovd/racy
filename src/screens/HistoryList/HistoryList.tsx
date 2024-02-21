@@ -30,7 +30,7 @@ export const HistoryList: FC = () => {
     <Body>
       <Title>История заездов</Title>
       <Laps>
-        {races?.map(race => (
+        {races?.reverse().map(race => (
           <HistoryItem key={race.date} {...race} />
         ))}
       </Laps>
